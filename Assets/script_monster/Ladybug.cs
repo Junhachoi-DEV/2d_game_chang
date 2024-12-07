@@ -10,10 +10,10 @@ public class Ladybug :Enermy
     // Start is called before the first frame update
     int weapon_damage;
     private float roll = 1;
-    GameObject effect;
+    //GameObject effect;
     Animator animator;
     public Transform ray;
-    public int Hp = 20;
+    public int Hp = 5;
     Transform target;
     float player_follow_limit;
     [Header("근접거리")]
@@ -33,9 +33,10 @@ public class Ladybug :Enermy
         animator = GetComponent<Animator>();
         home = transform.position;//물체의 위치
         target = GameObject.FindGameObjectWithTag("Player").GetComponent<player>().hiar.transform;//GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
-        GameObject weapon = Instantiate(prefab_weapon);
-        weapon_damage = weapon.GetComponent<granade>().granade_dmg;
-        effect = weapon.GetComponent<granade>().granade_effect;
+        //GameObject weapon = Instantiate(prefab_weapon);
+        weapon_damage = p.player_grenade_dmg;
+        Hp = 5;
+        //effect = weapon.GetComponent<granade>().granade_effect;
         //player_isleft= GameObject.FindGameObjectWithTag("Player").GetComponent<player>().;
     }
  
@@ -105,7 +106,6 @@ public class Ladybug :Enermy
         }
         else if(Vector2.Distance(home, transform.position) <= 0.5f && isEnd == true)
         {
-            Debug.Log("Move");
             isEnd = false;
         }
     }
@@ -161,17 +161,16 @@ public class Ladybug :Enermy
         animator.SetTrigger("Die");
         isDie = true;
         
-        Debug.Log("isroll");
-        Debug.Log(roll);
+        
         //isDamage = true;//적 못움직이게
         yield return new WaitForSeconds(0.3f);
         rb.AddForce(new Vector3(0, 0, 0));
         yield return new WaitForSeconds(4f);
         //폭발하도록하기
-        
+
         //Explosion();
         //yield return new WaitForSeconds(0.1f);
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
     float stoptime = 1f;
     private void OnCollisionStay2D(Collision2D collision)
@@ -199,7 +198,7 @@ public class Ladybug :Enermy
                 stoptime -= Time.deltaTime*1.25f;
                 if (stoptime <= 0)
                 {
-                    Debug.Log(stoptime);
+                    
                 }
                 else if(stoptime >0)
                 {
@@ -222,7 +221,7 @@ public class Ladybug :Enermy
     {
         
         Hp = h - damage;
-        Debug.Log(Hp);
+        
         if (Hp <= 0)
         {
             StartCoroutine(Die());
@@ -241,10 +240,10 @@ public class Ladybug :Enermy
     {
         iseffect = true;
         Transform d = collision.transform;
-        Destroy(collision);
-        GameObject eff = Instantiate(effect, transform.position, Quaternion.identity);
+        //Destroy(collision);
+        //GameObject eff = Instantiate(effect, transform.position, Quaternion.identity);
         yield return new WaitForSeconds(0.3f);
-        Destroy(eff);
+        //Destroy(eff);
         yield return new WaitForSeconds(0.1f);
         iseffect = false;
     }
@@ -255,27 +254,28 @@ public class Ladybug :Enermy
         {
             if (collision.tag == "weapon")
                 StartCoroutine(Attacked_weapon(collision.gameObject));
-            Debug.Log("weapondamage");
+            
             TakeDamage(weapon_damage, Hp);
+            game_manager.Instance.gm_ef_sound_mng("grenade_sound");
             isDamage = true;
-            Debug.Log("isnot move");
+            
             animator.SetBool("Attacked", true);
-            Debug.Log(isDamage);
+            
             Invoke("attacked", 0.15f);
             Invoke("damage", 0.15f);
             sprite.color = new Color(1, 0, 0, 1);
         }
         else if (collision.tag == "effect" && iseffect == false && isDie == false)
         {
-            Debug.Log("effectdamage");
+            
             TakeDamage(weapon_damage, Hp);
             isDamage = true;
-            Debug.Log("isnot move");
+           
             animator.SetBool("Attacked", true);
-            Debug.Log(isDamage);
+            
             Invoke("attacked", 0.15f);
             Invoke("damage", 0.15f);
-            Debug.Log(isDamage);
+            
             sprite.color = new Color(1, 0, 0, 1);
         }
 
@@ -288,6 +288,7 @@ public class Ladybug :Enermy
             TakeDamage(p.player_dmg, Hp);
             isDamage = true;
             sprite.color = new Color(1, 0, 0, 1);
+            //Debug.Log(Hp);
             animator.SetBool("Attacked", true);
             Invoke("attacked", 0.15f);
             Invoke("damage", 0.15f);
@@ -313,7 +314,7 @@ public class Ladybug :Enermy
             // Debug.Log("충돌");
             if (colider.tag == "Player")//콜라이더의 테그를 비교해서 플레이어면은 넣어놓는다
             {
-                Debug.Log("player damage");
+                
                 // melee.SetActive(true);
                 //colider.GetComponent<Rigidbody2D>().AddForce(new Vector2(20f * isLeft, 10f));
                 damage_manager.Instance.damage_count(1);

@@ -7,9 +7,9 @@ public class Bombbug : Enermy
     Animator animator;
     bool isFind = false;
     bool isexplosion = false;
-    public int Hp = 50;
+    public int Hp = 20;
     int weapon_damage;
-    GameObject effect;
+    //GameObject effect;
     public GameObject explosion;
     //public float r;
     Transform explosion_target;
@@ -25,9 +25,10 @@ public class Bombbug : Enermy
         op = Random.Range(0, 3);
         home = transform.position;//물체의 위치
         Physics2D.IgnoreLayerCollision(3, 11);//플레이어와의 충돌 무시
-        GameObject weapon = Instantiate(prefab_weapon);
-        weapon_damage = weapon.GetComponent<granade>().granade_dmg;
-        effect = weapon.GetComponent<granade>().granade_effect;
+        //GameObject weapon = Instantiate(prefab_weapon);
+        weapon_damage = p.player_grenade_dmg;
+        Hp = 20;
+        //effect = weapon.GetComponent<granade>().granade_effect;
     }
 
     // Update is called once per frame
@@ -139,7 +140,7 @@ public class Bombbug : Enermy
     {
         Hp = h - damage;
 
-        Debug.Log(Hp);
+        //Debug.Log(Hp);
         if (Hp <= 0)
         {
 
@@ -165,7 +166,7 @@ public class Bombbug : Enermy
         yield return new WaitForSeconds(0.2f);
         explosion.SetActive(false);
         yield return new WaitForSeconds(4f);
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 
 
@@ -180,7 +181,7 @@ public class Bombbug : Enermy
             // Debug.Log("충돌");
             if (colider.tag == "Player")//콜라이더의 테그를 비교해서 플레이어면은 넣어놓는다
             {
-                Debug.Log("explosion damage");
+                
                 damage_manager.Instance.damage_count(2); // 폭탄 벌레의 폭발
                 //colider.GetComponent<Rigidbody2D>().AddForce(new Vector2(400f * isLeft, 500f));
             }
@@ -200,10 +201,10 @@ public class Bombbug : Enermy
     {
         iseffect = true;
         Transform d = collision.transform;
-        Destroy(collision);
-        GameObject eff = Instantiate(effect, transform.position, Quaternion.identity);
+        //Destroy(collision);
+        //GameObject eff = Instantiate(effect, transform.position, Quaternion.identity);
         yield return new WaitForSeconds(0.3f);
-        Destroy(eff);
+        
         yield return new WaitForSeconds(0.1f);
         iseffect = false;
     }
@@ -219,29 +220,30 @@ public class Bombbug : Enermy
         {
             if (collision.tag == "weapon")
                 StartCoroutine(Attacked_weapon(collision.gameObject));
-            Debug.Log("weapondamage");
+            
             TakeDamage(weapon_damage,Hp);
+            game_manager.Instance.gm_ef_sound_mng("grenade_sound");
             isDamage = true;
-            Debug.Log("isnot move");
+            
             sprite.color = new Color(1, 1, 0, 1);
             animator.SetBool("Attacked", true);
-            Debug.Log(isDamage);
+            
             Invoke("attacked", 0.4f);
             Invoke("damage",0.4f);
           
         }
         else if(collision.tag=="effect"&&iseffect==false && isDie == false)
         {
-            Debug.Log("effectdamage");
+            
             TakeDamage(weapon_damage, Hp);
             isDamage = true;
-            Debug.Log("isnot move");
+            
             animator.SetBool("Attacked", true);
-            Debug.Log(isDamage);
+            
             sprite.color = new Color(1, 1, 0, 1);
             Invoke("attacked", 0.4f);
             Invoke("damage", 0.4f);
-            Debug.Log(isDamage);
+            //Debug.Log(isDamage);
            
         }
 
@@ -280,7 +282,7 @@ public class Bombbug : Enermy
     {
         p_left = isLeft;
         box.SetActive(true);
-        Debug.Log("yes");
+        //Debug.Log("yes");
         if (isLeft == -1)
         {
             //direct.localScale = new Vector3(direct.localScale.x, direct.localScale.y, direct.localScale.z);
@@ -308,7 +310,7 @@ public class Bombbug : Enermy
            // Debug.Log("충돌");
             if (colider.tag == "Player")//콜라이더의 테그를 비교해서 플레이어면은 넣어놓는다
             {
-                Debug.Log("player damage");
+                //Debug.Log("player damage");
                 damage_manager.Instance.damage_count(1); // 폭탄 벌레의 공격력 =1
                // colider.GetComponent<Rigidbody2D>().AddForce(new Vector2(200f*isLeft,10f));
             }

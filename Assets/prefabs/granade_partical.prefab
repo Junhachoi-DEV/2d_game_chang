@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 1633656837781741407}
   - component: {fileID: 5243368765508185613}
   - component: {fileID: 6903320026545593596}
-  m_Layer: 13
+  - component: {fileID: -4423171003301750526}
+  m_Layer: 15
   m_Name: granade_partical
   m_TagString: effect
   m_Icon: {fileID: 0}
@@ -4814,3 +4815,15 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &-4423171003301750526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142068123080188730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a08c012d8a70c75488c25c336ffc9aa7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -31,11 +31,11 @@ public class fade_manager : MonoBehaviour
     }
     *///¾È¾²´Â°Å
 
-    public void fade_in()
+    public void fade_in() //¹à¾ÆÁü
     {
         StartCoroutine(fade_in_out_co_ro(1, 0));
     }
-    public void fade_out()
+    public void fade_out() //¾îµÎ¿öÁü
     {
         StartCoroutine(fade_in_out_co_ro(0, 1));
     }

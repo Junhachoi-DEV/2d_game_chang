@@ -35,6 +35,22 @@ public class game_manager : MonoBehaviour
     }
     #endregion
 
+    background_sound bg_sound;
+    effects_sound ef_sound;
+    private void Start()
+    {
+        bg_sound = FindObjectOfType<background_sound>();
+        ef_sound = FindObjectOfType<effects_sound>();
+    }
+
+    public void gm_bg_sound_mng(string bgm_name)
+    {
+        bg_sound.play_sounds(bgm_name);
+    }
+    public void gm_ef_sound_mng(string efm_name)
+    {
+        ef_sound.play_sounds(efm_name);
+    }
 
     public void scene_load(string name)
     {

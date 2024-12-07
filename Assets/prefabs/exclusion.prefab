@@ -9,9 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3606087065601212251}
-  - component: {fileID: 3606087065601212250}
-  - component: {fileID: 6451484741328940375}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: exclusion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33,35 +31,3 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!58 &3606087065601212250
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3606087065601212249}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  serializedVersion: 2
-  m_Radius: 0.5
---- !u!114 &6451484741328940375
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3606087065601212249}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a08c012d8a70c75488c25c336ffc9aa7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  granade_dmg: 10
-  granade_effect: {fileID: 3889418791435815939, guid: 6ebd90dba46a73c4eb66f1bac9442775, type: 3}
-  granade_partical_ef: {fileID: 1142068123080188730, guid: cc533f3497d841c4cb0f8efac5e83107, type: 3}
-  granade_bottle_effect: {fileID: 6495080471278960431, guid: e272e490f586cc4418c20ad06d84499e, type: 3}

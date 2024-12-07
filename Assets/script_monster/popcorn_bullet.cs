@@ -32,7 +32,7 @@ public class popcorn_bullet : MonoBehaviour
     }
     public void Destroy()
     {
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -50,7 +50,7 @@ public class popcorn_bullet : MonoBehaviour
             // Debug.Log("충돌");
             if (colider.tag == "Player")//콜라이더의 테그를 비교해서 플레이어면은 넣어놓는다
             {
-                Debug.Log("player damage");
+                //Debug.Log("player damage");
                 damage_manager.Instance.damage_count(1);
                 StartCoroutine(attack());
             }

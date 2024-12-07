@@ -15,6 +15,7 @@ TagManager:
   - wall
   - monster_melee
   - p_melee
+  - npc
   layers:
   - Default
   - TransparentFX
@@ -69,4 +70,10 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 3974277329
+    locked: 0
+  - name: object3
+    uniqueID: 3988504411
+    locked: 0
+  - name: canvas
+    uniqueID: 4259862227
     locked: 0

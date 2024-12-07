@@ -7,6 +7,9 @@ public class player : MonoBehaviour
     //플레이어 정보
     public int player_hp;
     public int player_dmg;
+    public int player_grenade_dmg;
+    public int player_grenade_num;
+
     //속도
     public float apply_speed; // 현재 스피드
     public float crouch_speed = 0f;
@@ -20,9 +23,13 @@ public class player : MonoBehaviour
 
     //사용횟수 인트
     int stop_cnt; //벽점프 멈추게하는것 한번만 실행
+    int dash_sound_cut;
+    public int atk_num;
+    int fade_num;
 
     //타임
     float dash_timer;
+    float g_use_timer;
     [Range(0.1f, 3)] public float dash_time;
 
     //점프
@@ -35,7 +42,7 @@ public class player : MonoBehaviour
     float y;
 
     //기타 오브젝트
-    public GameObject granade;
+    public GameObject use_granade;
     public GameObject hiar;
     public GameObject p_melee;
     public GameObject dash_partical;
@@ -55,6 +62,8 @@ public class player : MonoBehaviour
     bool is_attacking; //공격 중
     bool do_atk; //공격 중 2
     public bool is_hook_range_max; // 갈고리 길이 최대 상태
+    bool is_use_g;
+    bool is_die;
 
     // 컴포넌트
     public Rigidbody2D rigid;
@@ -63,6 +72,9 @@ public class player : MonoBehaviour
     SpriteRenderer sprite;
     player_hp p_hp;
     menu_manager m_manager;
+    dialogue_controller d_controller;
+    obj_manager obj_m;
+    fade_manager f_mng;
     void Start()
     {
         anime = GetComponent<Animator>();
@@ -72,13 +84,17 @@ public class player : MonoBehaviour
         grap = GetComponent<grapping>();
         p_hp = FindObjectOfType<player_hp>();
         m_manager = FindObjectOfType<menu_manager>();
+        d_controller = FindObjectOfType<dialogue_controller>();
+        obj_m = FindObjectOfType<obj_manager>();
+        f_mng = FindObjectOfType<fade_manager>();
         is_trun = true;
     }
 
     void Update()
     {
         check_wall_and_bottom();
-        if (m_manager.is_menu_show)
+        die();
+        if (m_manager.is_menu_show || d_controller.is_talk || is_hitted)
         {
             return;
         }
@@ -87,13 +103,12 @@ public class player : MonoBehaviour
         player_use_granade();
         player_dash();
         player_attack();
-        die();
     }
 
     // 이동은 효율을 위해 여기에 넣는다.
     void FixedUpdate()
     {
-        if (is_hitted)
+        if (is_hitted || m_manager.is_menu_show || d_controller.is_talk)
         {
             return;
         }
@@ -171,6 +186,7 @@ public class player : MonoBehaviour
         if (!is_ground)
         {
             anime.SetBool("do_jump", true);
+            
         }
         else
         {
@@ -182,6 +198,7 @@ public class player : MonoBehaviour
             Invoke("jump_ani_deley", 0.5f);
             rigid.velocity = new Vector2(rigid.velocity.x, jump_force);
             anime.SetBool("do_jump", true);
+            game_manager.Instance.gm_ef_sound_mng("jump_step_sound");
         }
         else if (Input.GetButtonDown("Jump") && grap.is_attach) // 갈고리에 붙을시
         {
@@ -257,6 +274,7 @@ public class player : MonoBehaviour
             {
                 // is_trun이 트루면 왼쪽으로 펄스면 오른쪽으로 튕김 (즉 왼쪽벽에서 점프를 누르면 오른쪽으로 튕김)
                 rigid.velocity = new Vector2(wall_jump_force * (is_trun ? -1 : 1), wall_jump_force * 1.5f);
+                game_manager.Instance.gm_ef_sound_mng("wall_jump_step_sound");
                 anime.SetBool("is_wall", false);
                 anime.SetBool("do_jump", true);
                 Invoke("wall_jump_deley", 0.15f); // 튕기고 딜레이
@@ -284,19 +302,32 @@ public class player : MonoBehaviour
 
     void player_use_granade()
     {
+        if(g_use_timer <= 0.7f)
+        {
+            g_use_timer += Time.deltaTime;
+        }
+        else if (g_use_timer >= 0.7f)
+        {
+            is_use_g = false;
+        }
+
         if (is_attacking)
         {
             return;
         }
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.Q) && player_grenade_num > 0 && !is_use_g)
         {
             // 참고로 중력값은 2이다.
-            GameObject ins_granade = Instantiate(granade, transform.position, transform.rotation); // 캐릭터 위치에서 생성, 나중에 오브젝트 풀링 해줄거임.
-            Rigidbody2D rigid_granade = ins_granade.GetComponent<Rigidbody2D>(); // 물리 선언
-            
+            //GameObject ins_granade = Instantiate(granade, transform.position, transform.rotation); // 캐릭터 위치에서 생성, 나중에 오브젝트 풀링 해줄거임.
+            GameObject granade_obj = obj_m.make_obj("grenades");
+            Rigidbody2D rigid_granade = granade_obj.GetComponent<Rigidbody2D>(); // 물리 선언
+
+            granade_obj.transform.position = gameObject.transform.position;
             //캐릭터위치에서 (위* 힘* 조절) + (오른쪽 * 힘* 캐릭터 바라보는 방향) = 대각선으로 포물선을 그린다.
             rigid_granade.velocity = (transform.up * g_force *0.7f ) + (transform.right * g_force * (is_trun ? 1 : -1));
-           
+            player_grenade_num--;
+            is_use_g = true;
+            g_use_timer = 0;
         }
     }
     
@@ -314,7 +345,11 @@ public class player : MonoBehaviour
             if (Input.GetKey(KeyCode.LeftShift))
             {
                 is_dash = true;
-
+                if (dash_sound_cut <= 0)
+                {
+                    game_manager.Instance.gm_ef_sound_mng("dash_sound");
+                    dash_sound_cut++;
+                }
                 if (is_dash)
                 {
                     dash_timer += Time.deltaTime;
@@ -353,6 +388,7 @@ public class player : MonoBehaviour
             apply_speed = run_speed;
             dash_partical.SetActive(false);
             j_dash_partical.SetActive(false);
+            dash_sound_cut = 0;
         }
     }
     void dash_deley()
@@ -368,6 +404,7 @@ public class player : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             anime.SetTrigger("is_atk");
+
         }
         
     }
@@ -400,52 +437,79 @@ public class player : MonoBehaviour
         p_melee.SetActive(false);
     }
     #endregion
-    #region 공격 콜라이더 크기
+    #region 공격 콜라이더 크기 및 넘버
     public void atk1_collider_transform()
     {
+        atk_num = 1;
         p_melee.transform.localPosition = new Vector3(1.32f, -0.12f, 0);
         p_melee.transform.localScale = new Vector3(1.51f, 0.99f, 0);
     }
     public void atk2_collider_transform()
     {
+        atk_num = 1;
         p_melee.transform.localPosition = new Vector3(1.32f, -0.12f, 0);
         p_melee.transform.localScale = new Vector3(1.8f, 1.26f, 0);
     }
     public void atk3_collider_transform()
     {
+        atk_num = 2;
         p_melee.transform.localPosition = new Vector3(1.12f, 0, 0);
         p_melee.transform.localScale = new Vector3(2.29f, 1.65f, 0);
     }
     public void jump_atk_collider_transform()
     {
+        atk_num = 2;
         p_melee.transform.localPosition = new Vector3(1.12f, 0, 0);
         p_melee.transform.localScale = new Vector3(2.02f, 1.6f, 0);
+    }
+    #endregion
+    #region 공격사운드
+    public void atk1_sound()
+    {
+        game_manager.Instance.gm_ef_sound_mng("atk1_sound");
+        
+    }
+    public void atk2_sound()
+    {
+        game_manager.Instance.gm_ef_sound_mng("atk2_sound");
     }
     #endregion
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.tag == "monster_melee")
         {
+
             is_hitted = true;
+            gameObject.layer = 14; // 무적
             player_hp -= damage_manager.Instance.en_dmg;
             p_hp.count -= damage_manager.Instance.en_dmg;
             p_hp.count++; // 한번만 실행 하기위해 넣어줬다.
             anime.SetTrigger("is_hitted");
-            gameObject.layer = 14; // 무적
+            dash_partical.SetActive(false);
+            j_dash_partical.SetActive(false);
             sprite.color = new Color(1, 1, 1, 0.5f); //투명해짐
             hitted_anime_stop();
-            Invoke("hitted_deley", 0.3f);
-            Invoke("hitted_back", 2f);
+            if (!is_die)
+            {
+                Invoke("hitted_deley", 0.3f);
+                Invoke("hitted_back", 2f);
+            }
         }
     }
     void hitted_back()
     {
-        gameObject.layer = 3; // 무적 다시 돌아옴
-        sprite.color = new Color(1, 1, 1, 1);
+        if (!is_die)
+        {
+            gameObject.layer = 3; // 무적 다시 돌아옴
+            sprite.color = new Color(1, 1, 1, 1);
+        }
     }
     void hitted_deley()
     {
-        is_hitted = false;
+        if (!is_die)
+        {
+            is_hitted = false;
+        }
     }
     void hitted_anime_stop()
     {
@@ -457,10 +521,28 @@ public class player : MonoBehaviour
     }
     void die()
     {
-        if (player_hp <= 0)
+        if (player_hp <= 0 && fade_num<=0)
         {
             is_hitted = true;
+            is_die = true;
             gameObject.layer = 14; // 무적
+            rigid.velocity = new Vector2(jump_force/2 * (is_trun ? -1 : 1), jump_force / 2);
+            StartCoroutine(die_co_ro());
+            fade_num++;
         }
+    }
+    
+    IEnumerator die_co_ro()
+    {
+        anime.SetBool("is_die", true);
+        yield return new WaitForSeconds(0.4f);
+        hiar.transform.localPosition = new Vector3(0, -0.35f, 0);
+        hiar.SetActive(false);
+        yield return new WaitForSeconds(1.0f);
+
+        f_mng.fade_img.gameObject.SetActive(true);
+        f_mng.fade_out();
+        yield return new WaitForSeconds(1f);
+        m_manager.gameover_menu.SetActive(true);
     }
 }

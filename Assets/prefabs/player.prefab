@@ -71,7 +71,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b3028fb4e8b4474d8e66d43e7c6bfb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hit_effect: {fileID: 5326583558979532814, guid: 9890e5625be6ceb4a8a15b6895560421, type: 3}
 --- !u!1 &192137559
 GameObject:
   m_ObjectHideFlags: 0
@@ -9848,6 +9847,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player_hp: 10
   player_dmg: 1
+  player_grenade_dmg: 10
+  player_grenade_num: 15
   apply_speed: 0
   crouch_speed: 0
   run_speed: 5
@@ -9855,11 +9856,12 @@ MonoBehaviour:
   dash_speed: 9
   ray_dis: 0.76
   ray_wall_dis: 0.32
+  atk_num: 0
   dash_time: 0.3
   jump_force: 10
   hook_jump_force: 8
   wall_jump_force: 5
-  granade: {fileID: 5597152920646754465, guid: 186541266adc7da49ad0bc45fa613138, type: 3}
+  use_granade: {fileID: 0}
   hiar: {fileID: 8666735072760822557}
   p_melee: {fileID: 45429254}
   dash_partical: {fileID: 300925978}

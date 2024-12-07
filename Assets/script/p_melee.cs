@@ -4,14 +4,30 @@ using UnityEngine;
 
 public class p_melee : MonoBehaviour
 {
-    public GameObject hit_effect;
+    player p;
+    obj_manager obj_m;
+    private void Start()
+    {
+        p = FindObjectOfType<player>();
+        obj_m = FindObjectOfType<obj_manager>();
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.tag == "Monster")
         {
-            GameObject hit_ef = Instantiate(hit_effect, collision.transform.localPosition, collision.transform.localRotation);
-            Destroy(hit_ef, 0.2f);
+            GameObject hit_effect = obj_m.make_obj("hit_ef");
+            hit_effect.transform.position = collision.transform.position;
+            if (p.atk_num == 1)
+            {
+                game_manager.Instance.gm_ef_sound_mng("atk1_hit_sound");
+            }
+            else
+            {
+                game_manager.Instance.gm_ef_sound_mng("atk2_hit_sound");
+            }
+            
         }
     }
+    
 }

@@ -21,10 +21,16 @@ public class dialogue_controller : MonoBehaviour
     public int count = 0; //몇번째 대사인지
     public bool is_talk =true;
     public bool is_typing;
+    bool text_finish;
+
+    //대화 상대
+    public bool story1;
+    public bool mushroom;
+    public bool npc_spider_store;
+
     public _dialogue[] dialogues; //배열
 
     
-    bool text_finish;
 
     private void Update()
     {
@@ -47,7 +53,10 @@ public class dialogue_controller : MonoBehaviour
                 {
                     is_talk = false;
                     //fade.fade_out();
-                    Invoke("scene_load_deley", 0.1f);
+                    if (story1)
+                    {
+                        Invoke("scene_load_deley", 0.1f);
+                    }
                 }
             }
             else if(is_typing && Input.GetMouseButtonDown(0))
@@ -61,6 +70,7 @@ public class dialogue_controller : MonoBehaviour
         {
             //is_typing = false;
             //text_finish = true;
+            dialog_talk.text = "";
             t_panel.SetActive(false);
             count = 0;
         }
@@ -107,6 +117,7 @@ public class dialogue_controller : MonoBehaviour
     {
         is_talk = true;
         game_manager.Instance.scene_load("loading_scene");
+        game_manager.Instance.gm_bg_sound_mng("ingame_bgm");
     }
 
     IEnumerator typing(string text)

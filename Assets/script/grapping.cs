@@ -40,13 +40,12 @@ public class grapping : MonoBehaviour
         line.SetPosition(0, transform.position);
         line.SetPosition(1, hook.position);
         hook_ef.transform.position = transform.position;// 이펙트의 위치는 플레이어 정중앙
-
-
+        
         if (Input.GetMouseButtonDown(1) && !is_hook_key_down) // 마우스 오른쪽을 누르고 훅키를 안눌렀을때
         {
             line.enabled = false;
             hook.position = transform.position; // 누를시 처음위치
-
+            game_manager.Instance.gm_ef_sound_mng("atk1_sound");
             // 화면(스크린)월드 좌표에 마우스 위치에 케릭터 위치를 빼면 = 마우스의 방향
             mouse_direction = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
 

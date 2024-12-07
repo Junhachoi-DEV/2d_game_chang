@@ -6,12 +6,13 @@ public class Popcornbug : Enermy
 {
     Animator animator;
     bool isFind = false;
-    public int Hp = 30;
+    public int Hp = 3;
     int weapon_damage;
-    GameObject effect;
+    //GameObject effect;
     player p;
     //public float r;
     SpriteRenderer sprite;
+    obj_manager obj_m;
     // Start is called before the first frame update
     private void Awake()
     {
@@ -24,9 +25,11 @@ public class Popcornbug : Enermy
         Physics2D.IgnoreLayerCollision(3, 11);//플레이어와의 충돌 무시
         Physics2D.IgnoreLayerCollision(11,12);//몬스터와의 충돌무시
         Physics2D.IgnoreLayerCollision(11, 11);
-        GameObject weapon = Instantiate(prefab_weapon);
-        weapon_damage = weapon.GetComponent<granade>().granade_dmg;
-        effect = weapon.GetComponent<granade>().granade_effect;
+        //GameObject weapon = Instantiate(prefab_weapon);
+        weapon_damage = p.player_grenade_dmg;
+        obj_m = FindObjectOfType<obj_manager>();
+        Hp = 3;
+        //effect = weapon.GetComponent<granade>().granade_effect;
     }
 
     // Update is called once per frame
@@ -139,7 +142,7 @@ public class Popcornbug : Enermy
     {
         Hp = h - damage;
 
-        Debug.Log(Hp);
+        //Debug.Log(Hp);
         if (Hp <= 0)
         {
 
@@ -154,17 +157,17 @@ public class Popcornbug : Enermy
         isDie = true;
         //isDamage = true;//적 못움직이게
         yield return new WaitForSeconds(3.5f);
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 
     IEnumerator Attacked_weapon(GameObject collision)
     {
         iseffect = true;
         Transform d = collision.transform;
-        Destroy(collision);
-        GameObject eff = Instantiate(effect, transform.position, Quaternion.identity);
+        //Destroy(collision);
+        //GameObject eff = Instantiate(effect, transform.position, Quaternion.identity);
         yield return new WaitForSeconds(0.3f);
-        Destroy(eff);
+        //Destroy(eff);
         yield return new WaitForSeconds(0.1f);
         iseffect = false;
     }
@@ -181,12 +184,13 @@ public class Popcornbug : Enermy
         {
             if (collision.tag == "weapon")
                 StartCoroutine(Attacked_weapon(collision.gameObject));
-            Debug.Log("weapondamage");
+            
             TakeDamage(weapon_damage, Hp);
+            game_manager.Instance.gm_ef_sound_mng("grenade_sound");
             isDamage = true;
-            Debug.Log("isnot move");
+            
             animator.SetBool("Attacked", true);
-            Debug.Log(isDamage);
+            
             sprite.color = new Color(1, 0, 0, 1);
             Invoke("attacked", 0.4f);
             Invoke("damage", 0.4f);
@@ -194,16 +198,16 @@ public class Popcornbug : Enermy
         }
         else if (collision.tag == "effect" && iseffect == false && isDie == false)
         {
-            Debug.Log("effectdamage");
+            
             TakeDamage(weapon_damage, Hp);
             isDamage = true;
-            Debug.Log("isnot move");
+            
             animator.SetBool("Attacked", true);
-            Debug.Log(isDamage);
+            
             sprite.color = new Color(1, 0, 0, 1);
             Invoke("attacked", 0.4f);
             Invoke("damage", 0.4f);
-            Debug.Log(isDamage);
+            
 
 
         }
@@ -269,10 +273,11 @@ public class Popcornbug : Enermy
             }
 
         }
-       // Debug.Log("yes");
-        
-        
-        bullet= Instantiate(popcorn_bullet, boxpos.position, transform.rotation);
+        // Debug.Log("yes");
+
+        bullet = obj_m.make_obj("popcornbug_bullet");
+        bullet.transform.position = boxpos.transform.position;
+        //bullet= Instantiate(popcorn_bullet, boxpos.position, transform.rotation);
        
         //bullet.transform.Translate(player_position);  //Vector2.MoveTowards(bullet.transform.position, player_position.position, Time.deltaTime * speed);
         //bullet.transform.position= Vector2.MoveTowards(bullet.transform.position, player_position.position, Time.deltaTime * speed);
